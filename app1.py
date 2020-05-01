@@ -9,6 +9,9 @@ yesTup = ('yes', 'y', 'ok')
 noTup = ('no', 'n', 'nope')
 
 def translate(word):
+  if word in data:
+    return data[word]
+
   word = word.lower()
 
   if word in data:
@@ -23,8 +26,10 @@ def translate(word):
     yn = input(text)
     if yn.lower() in yesTup:
       return ["Ok, here's the definition for %s." % suggestion] + data[suggestion]
+    else:
+      return ["Well alrighty then."]
   else:
-    return ["That word is not in this dictionary. Please double-check you're spelling and try again."]
+    return ["That's not even close to a word... Sorry."]
 
 word = input("Please enter a word: ")
 translation = translate(word)
