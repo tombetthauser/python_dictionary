@@ -1,38 +1,39 @@
 from json import load
-from difflib import get_close_matches
+from difflib import get_close_matches as close
 from random import random
 
 data = load(open("data.json"))
 words = list(data.keys())
 
-yesTup = ('yes', 'y', 'ok')
-noTup = ('no', 'n', 'nope')
+store = {
+    "almost": "That's almost a word... Did you mean %s instead? ",
+    "sorry ": "That's not even close to a word... Sorry.",
+    "here": "Ok, here's the definition for %s.",
+    "enter": "Please enter a word: ",
+    "alright": "Well alrighty then.",
+    "yestup": ('yes', 'y', 'ok')
+}
 
-def translate(word):
-  if word in data:
-    return data[word]
-
+def lookup(word):
+  if word in data: return data[word]
+  
   word = word.lower()
+  if word in data: return data[word]
 
-  if word in data:
-    return data[word]
-
-  matches = get_close_matches(word, data.keys())
+  matches = close(word, data.keys())
   matchLen = len(matches)
+
   if matchLen > 0:
-    randomIdx = int(random() * matchLen)
-    suggestion = matches[randomIdx]
-    text = "That's almost a word... Did you mean %s instead? " % suggestion
-    yn = input(text)
-    if yn.lower() in yesTup:
-      return ["Ok, here's the definition for %s." % suggestion] + data[suggestion]
-    else:
-      return ["Well alrighty then."]
-  else:
-    return ["That's not even close to a word... Sorry."]
+    rand = int(random() * matchLen)
+    maybe = matches[rand]
+    text = store["almost"] % maybe
+    resp = input(text)
 
-word = input("Please enter a word: ")
-translation = translate(word)
+    if resp.lower() in store["yestup"]: return [store["here"] % maybe] + data[maybe]
+    else: return [store["alright"]]
+  else: return [store["sorry"]]
 
-for entry in translation:
-  print(entry)
+word = input(store["enter"])
+trans = lookup(word)
+
+for entry in trans: print(entry)
